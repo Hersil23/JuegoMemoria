@@ -36,11 +36,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isMatch) {
       firstCard.classList.add('matched');
       secondCard.classList.add('matched');
-
-      // Registrar quién hizo el par
       firstCard.dataset.owner = turn;
       secondCard.dataset.owner = turn;
-
       document.dispatchEvent(new CustomEvent('resetTurn'));
     } else {
       setTimeout(() => {
@@ -50,7 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }, 1000);
     }
 
-    // Verificar si terminó el juego
     const matchedCards = document.querySelectorAll('.matched');
     if (matchedCards.length === cards.length) {
       const userPairs = [...matchedCards].filter(card => card.dataset.owner === 'user').length;
@@ -67,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       setTimeout(() => {
         alert(`Fin del juego. ${winner}`);
-        resetGame(); // Reiniciar el juego
+        resetGame();
       }, 500);
     }
   });
@@ -85,14 +81,19 @@ document.addEventListener('DOMContentLoaded', () => {
       turnElement.textContent = `Turno: ${turn === 'user' ? 'Usuario' : 'Computadora'}`;
     }
 
-    if (turn === 'computer') {
-      setTimeout(() => document.dispatchEvent(new CustomEvent('computerPlay')), 1500);
+    // ✅ Evitar doble turno de la computadora
+    if (turn === 'computer' && !lockBoard) {
+      lockBoard = true; // Bloqueamos el tablero para evitar múltiples ejecuciones
+      setTimeout(() => {
+        document.dispatchEvent(new CustomEvent('computerPlay'));
+      }, 1500);
     }
   }
 
   document.addEventListener('computerPlay', () => {
-    lockBoard = true;
     const availableCards = [...cards].filter(card => !card.classList.contains('open') && !card.classList.contains('matched'));
+
+    // ✅ Si no hay suficientes cartas, desbloqueamos y salimos
     if (availableCards.length < 2) {
       lockBoard = false;
       return;
@@ -124,7 +125,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function resetGame() {
-    // Ocultar y limpiar todas las cartas
     cards.forEach(card => {
       card.classList.remove('open', 'matched');
       card.textContent = '';
@@ -133,7 +133,6 @@ document.addEventListener('DOMContentLoaded', () => {
       delete card.dataset.owner;
     });
 
-    // Mezclar los valores de las cartas
     const values = [...cards].map(card => card.dataset.value);
     const shuffledValues = values.sort(() => 0.5 - Math.random());
 
@@ -141,7 +140,6 @@ document.addEventListener('DOMContentLoaded', () => {
       card.dataset.value = shuffledValues[index];
     });
 
-    // Reiniciar estado del juego
     firstCard = null;
     const turnElement = document.getElementById('turn');
     if (turnElement) {
