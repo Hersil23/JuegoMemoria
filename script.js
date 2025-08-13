@@ -80,7 +80,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function switchTurn() {
     turn = turn === 'user' ? 'computer' : 'user';
-    document.getElementById('turn').textContent = `Turno: ${turn === 'user' ? 'Usuario' : 'Computadora'}`;
+    const turnElement = document.getElementById('turn');
+    if (turnElement) {
+      turnElement.textContent = `Turno: ${turn === 'user' ? 'Usuario' : 'Computadora'}`;
+    }
 
     if (turn === 'computer') {
       setTimeout(() => document.dispatchEvent(new CustomEvent('computerPlay')), 1500);
@@ -140,7 +143,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Reiniciar estado del juego
     firstCard = null;
-    secondCard = null;
+    const turnElement = document.getElementById('turn');
+    if (turnElement) {
+      turnElement.textContent = 'Turno: Usuario';
+    }
     lockBoard = false;
     turn = 'user';
     document.getElementById('turn').textContent = 'Turno: Usuario';
